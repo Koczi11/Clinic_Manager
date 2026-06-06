@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Clinic_Manager.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,9 +13,19 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     }
 
+    public DbSet<Patient> Patients => Set<Patient>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        // E tutaj dodamy konfigurację indeksów i relacji dla naszych modeli medycznych jak coś :)
+
+        builder.Entity<Patient>(entity =>
+        {
+            entity.HasQueryFilter(p => !p.IsDeleted);
+
+            entity.HasIndex(p => p.Pesel);
+
+            entity.HasIndex(p => p.LastName);
+        });
     }
 }
