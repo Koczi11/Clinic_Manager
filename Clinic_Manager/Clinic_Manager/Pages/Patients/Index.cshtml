@@ -1,0 +1,60 @@
+@page
+@model Clinic_Manager.Pages.Patients.IndexModel
+@{
+    ViewData["Title"] = "Pacjenci";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Pacjenci</h1>
+    <a asp-page="Create" class="btn btn-success">+ Dodaj pacjenta</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input asp-for="Query" class="form-control" placeholder="Szukaj po nazwisku lub PESEL..." />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Szukaj</button>
+        <a asp-page="Index" class="btn btn-outline-secondary">Wyczyść</a>
+    </div>
+</form>
+
+@if (!Model.Patients.Any())
+{
+    <div class="alert alert-info">Brak pacjentów do wyświetlenia.</div>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Nazwisko</th>
+                <th>Imię</th>
+                <th>PESEL</th>
+                <th>Data urodzenia</th>
+                <th>Telefon</th>
+                <th class="text-end">Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model.Patients)
+            {
+                <tr>
+                    <td>@patient.LastName</td>
+                    <td>@patient.FirstName</td>
+                    <td>@patient.Pesel</td>
+                    <td>@patient.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                    <td>@patient.PhoneNumber</td>
+                    <td class="text-end">
+                        <a asp-page="Details" asp-route-id="@patient.Id" class="btn btn-sm btn-outline-info">Szczegóły</a>
+                        <a asp-page="Edit" asp-route-id="@patient.Id" class="btn btn-sm btn-outline-primary">Edytuj</a>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@patient.Id" class="d-inline"
+                              onsubmit="return confirm('Czy na pewno usunąć pacjenta @patient.LastName @patient.FirstName?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
