@@ -45,6 +45,7 @@ public class SeedData
         }
 
         await SeedPatients(context);
+        await SeedMedications(context);
     }
 
      private static async Task SeedPatients(ApplicationDbContext context)
@@ -67,6 +68,37 @@ public class SeedData
         };
 
         await context.Patients.AddRangeAsync(patients);
+        await context.SaveChangesAsync();
+    }
+
+    // Seed przykładowego katalogu leków - tylko gdy tabela jest pusta.
+    private static async Task SeedMedications(ApplicationDbContext context)
+    {
+        if (await context.Medications.AnyAsync())
+        {
+            return;
+        }
+
+        var medications = new List<Medication>
+        {
+            new() { Name = "Apap", Description = "Paracetamol 500 mg, lek przeciwbólowy i przeciwgorączkowy", UnitPrice = 8.99m, Unit = "tabletka" },
+            new() { Name = "Ibuprom", Description = "Ibuprofen 200 mg, lek przeciwzapalny", UnitPrice = 12.50m, Unit = "tabletka" },
+            new() { Name = "Aspiryna", Description = "Kwas acetylosalicylowy 500 mg", UnitPrice = 9.20m, Unit = "tabletka" },
+            new() { Name = "Amoksiklav", Description = "Antybiotyk - amoksycylina z kwasem klawulanowym", UnitPrice = 24.99m, Unit = "tabletka" },
+            new() { Name = "Augmentin", Description = "Antybiotyk o szerokim spektrum działania", UnitPrice = 28.40m, Unit = "tabletka" },
+            new() { Name = "Polopiryna", Description = "Kwas acetylosalicylowy, przeciwgorączkowy", UnitPrice = 6.75m, Unit = "tabletka" },
+            new() { Name = "Nurofen", Description = "Ibuprofen 400 mg", UnitPrice = 15.30m, Unit = "tabletka" },
+            new() { Name = "Gripex", Description = "Lek na objawy przeziębienia i grypy", UnitPrice = 17.99m, Unit = "tabletka" },
+            new() { Name = "Rutinoscorbin", Description = "Witamina C z rutyną, wzmacnia odporność", UnitPrice = 13.49m, Unit = "tabletka" },
+            new() { Name = "No-Spa", Description = "Drotaweryna, lek rozkurczowy", UnitPrice = 19.90m, Unit = "tabletka" },
+            new() { Name = "Xanax", Description = "Alprazolam, lek przeciwlękowy (na receptę)", UnitPrice = 22.00m, Unit = "tabletka" },
+            new() { Name = "Metformina", Description = "Lek przeciwcukrzycowy", UnitPrice = 11.80m, Unit = "tabletka" },
+            new() { Name = "Euthyrox", Description = "Lewotyroksyna, hormon tarczycy", UnitPrice = 14.60m, Unit = "tabletka" },
+            new() { Name = "Syrop Herbapect", Description = "Syrop na kaszel mokry", UnitPrice = 16.20m, Unit = "ml" },
+            new() { Name = "Maść Tribiotic", Description = "Maść z antybiotykiem do stosowania na skórę", UnitPrice = 21.50m, Unit = "g" }
+        };
+
+        await context.Medications.AddRangeAsync(medications);
         await context.SaveChangesAsync();
     }
 }
