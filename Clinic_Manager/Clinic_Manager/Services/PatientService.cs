@@ -34,7 +34,8 @@ public class PatientService : IPatientService
 
     public async Task<PatientDto?> GetByIdAsync(int id)
     {
-        var patient = await _context.Patients.FindAsync(id);
+        // FirstOrDefault (nie Find) - aby zadziałał globalny filtr soft-delete.
+        var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == id);
         return patient is null ? null : _mapper.ToDto(patient);
     }
 
@@ -51,7 +52,7 @@ public class PatientService : IPatientService
 
     public async Task<bool> UpdateAsync(int id, UpdatePatientDto dto)
     {
-        var patient = await _context.Patients.FindAsync(id);
+        var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == id);
         if (patient is null)
         {
             return false;
@@ -66,7 +67,7 @@ public class PatientService : IPatientService
 
     public async Task<bool> SoftDeleteAsync(int id)
     {
-        var patient = await _context.Patients.FindAsync(id);
+        var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == id);
         if (patient is null)
         {
             return false;
