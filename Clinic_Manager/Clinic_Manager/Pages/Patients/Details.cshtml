@@ -1,0 +1,33 @@
+@page
+@model Clinic_Manager.Pages.Patients.DetailsModel
+@{
+    ViewData["Title"] = "Szczegóły pacjenta";
+}
+
+<h1 class="mb-4">@Model.Patient.LastName @Model.Patient.FirstName</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">PESEL</dt>
+    <dd class="col-sm-9">@Model.Patient.Pesel</dd>
+
+    <dt class="col-sm-3">Imię</dt>
+    <dd class="col-sm-9">@Model.Patient.FirstName</dd>
+
+    <dt class="col-sm-3">Nazwisko</dt>
+    <dd class="col-sm-9">@Model.Patient.LastName</dd>
+
+    <dt class="col-sm-3">Data urodzenia</dt>
+    <dd class="col-sm-9">@Model.Patient.DateOfBirth.ToString("yyyy-MM-dd")</dd>
+
+    <dt class="col-sm-3">Telefon</dt>
+    <dd class="col-sm-9">@(Model.Patient.PhoneNumber ?? "—")</dd>
+
+    <dt class="col-sm-3">E-mail</dt>
+    <dd class="col-sm-9">@(Model.Patient.Email ?? "—")</dd>
+
+    <dt class="col-sm-3">Adres</dt>
+    <dd class="col-sm-9">@(Model.Patient.Address ?? "—")</dd>
+</dl>
+
+<a asp-page="Edit" asp-route-id="@Model.Patient.Id" class="btn btn-primary">Edytuj</a>
+<a asp-page="Index" class="btn btn-outline-secondary">Powrót do listy</a>
