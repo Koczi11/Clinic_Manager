@@ -26,6 +26,9 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 builder.Services.AddSingleton<PatientMapper>();
 builder.Services.AddScoped<IPatientService, PatientService>();
 
+builder.Services.AddSingleton<MedicationMapper>();
+builder.Services.AddScoped<IMedicationService, MedicationService>();
+
 builder.Services.AddRazorPages();
 
 builder.Services.AddControllers();
