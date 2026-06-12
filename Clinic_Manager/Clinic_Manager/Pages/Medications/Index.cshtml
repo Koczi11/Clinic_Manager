@@ -1,0 +1,57 @@
+@page
+@model Clinic_Manager.Pages.Medications.IndexModel
+@{
+    ViewData["Title"] = "Katalog leków";
+    var canEdit = User.IsInRole("Admin") || User.IsInRole("Rejestratorka");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Katalog leków</h1>
+    @if (canEdit)
+    {
+        <a asp-page="Create" class="btn btn-success">+ Dodaj lek</a>
+    }
+</div>
+
+@if (!Model.Medications.Any())
+{
+    <div class="alert alert-info">Brak leków w katalogu.</div>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Nazwa</th>
+                <th>Opis</th>
+                <th class="text-end">Cena jedn.</th>
+                <th>Jednostka</th>
+                @if (canEdit)
+                {
+                    <th class="text-end">Akcje</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var medication in Model.Medications)
+            {
+                <tr>
+                    <td>@medication.Name</td>
+                    <td>@medication.Description</td>
+                    <td class="text-end">@medication.UnitPrice.ToString("0.00") zł</td>
+                    <td>@medication.Unit</td>
+                    @if (canEdit)
+                    {
+                        <td class="text-end">
+                            <a asp-page="Edit" asp-route-id="@medication.Id" class="btn btn-sm btn-outline-primary">Edytuj</a>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@medication.Id" class="d-inline"
+                                  onsubmit="return confirm('Czy na pewno usunąć lek @medication.Name?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Usuń</button>
+                            </form>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -14,6 +14,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     }
 
     public DbSet<Patient> Patients => Set<Patient>();
+    public DbSet<Medication> Medications => Set<Medication>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -26,6 +27,13 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             entity.HasIndex(p => p.Pesel);
 
             entity.HasIndex(p => p.LastName);
+        });
+
+        builder.Entity<Medication>(entity =>
+        {
+            entity.Property(m => m.UnitPrice).HasPrecision(18, 2);
+
+            entity.HasIndex(m => m.Name);
         });
     }
 }
