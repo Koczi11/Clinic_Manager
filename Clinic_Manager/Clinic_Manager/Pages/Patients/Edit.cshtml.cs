@@ -42,7 +42,8 @@ public class EditModel : PageModel
             DateOfBirth = patient.DateOfBirth,
             PhoneNumber = patient.PhoneNumber,
             Email = patient.Email,
-            Address = patient.Address
+            Address = patient.Address,
+            InsuranceNumber = patient.InsuranceNumber
         };
 
         return Page();

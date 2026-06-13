@@ -33,6 +33,10 @@ public class Patient
     [StringLength(250)]
     public string? Address { get; set; }
 
+    [StringLength(50)]
+    [Display(Name = "Numer ubezpieczenia")]
+    public string? InsuranceNumber { get; set; }
+
     // Soft delete
     public bool IsDeleted { get; set; }
 

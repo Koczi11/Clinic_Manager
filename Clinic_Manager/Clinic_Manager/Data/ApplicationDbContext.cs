@@ -1,4 +1,4 @@
-﻿using Clinic_Manager.Models;
+using Clinic_Manager.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +15,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<Patient> Patients => Set<Patient>();
     public DbSet<Medication> Medications => Set<Medication>();
+    public DbSet<MedicalRecord> MedicalRecords => Set<MedicalRecord>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -34,6 +35,16 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             entity.Property(m => m.UnitPrice).HasPrecision(18, 2);
 
             entity.HasIndex(m => m.Name);
+        });
+
+        builder.Entity<MedicalRecord>(entity =>
+        {
+            entity.HasOne(mr => mr.Patient)
+                .WithMany()
+                .HasForeignKey(mr => mr.PatientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(mr => mr.PatientId);
         });
     }
 }
