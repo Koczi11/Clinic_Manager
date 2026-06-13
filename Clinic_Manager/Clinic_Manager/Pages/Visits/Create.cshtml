@@ -1,0 +1,71 @@
+@page
+@model Clinic_Manager.Pages.Visits.CreateModel
+@{
+    ViewData["Title"] = "Zaplanuj wizytę";
+}
+
+<h1 class="mb-4">Zaplanuj nową wizytę</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Szczegóły wizyty</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.PatientId" class="form-label">Wybierz pacjenta</label>
+                        @if (!Model.Patients.Any())
+                        {
+                            <div class="alert alert-warning py-2 small">Brak zarejestrowanych pacjentów w systemie. <a asp-page="/Patients/Create">Dodaj pacjenta</a>.</div>
+                        }
+                        else
+                        {
+                            <select asp-for="Input.PatientId" asp-items="Model.Patients" class="form-select">
+                                <option value="">-- Wybierz pacjenta --</option>
+                            </select>
+                        }
+                        <span asp-validation-for="Input.PatientId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.DoctorId" class="form-label">Wybierz lekarza</label>
+                        @if (!Model.Doctors.Any())
+                        {
+                            <div class="alert alert-warning py-2 small">Brak lekarzy zarejestrowanych w systemie. Skontaktuj się z administratorem.</div>
+                        }
+                        else
+                        {
+                            <select asp-for="Input.DoctorId" asp-items="Model.Doctors" class="form-select">
+                                <option value="">-- Wybierz lekarza --</option>
+                            </select>
+                        }
+                        <span asp-validation-for="Input.DoctorId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.VisitDate" class="form-label">Data i godzina wizyty</label>
+                        <input asp-for="Input.VisitDate" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="Input.VisitDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Description" class="form-label">Cel wizyty / Opis dolegliwości</label>
+                        <textarea asp-for="Input.Description" rows="4" class="form-control" placeholder="Wpisz cel wizyty, np. konsultacja kardiologiczna, badanie kontrolne..."></textarea>
+                        <span asp-validation-for="Input.Description" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-success" @(Model.Patients.Any() && Model.Doctors.Any() ? "" : "disabled")>Zapisz wizytę</button>
+                    <a asp-page="Index" class="btn btn-outline-secondary">Anuluj</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

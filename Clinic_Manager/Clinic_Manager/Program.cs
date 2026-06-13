@@ -32,6 +32,9 @@ builder.Services.AddScoped<IMedicationService, MedicationService>();
 builder.Services.AddSingleton<MedicalRecordMapper>();
 builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 
+builder.Services.AddSingleton<VisitMapper>();
+builder.Services.AddScoped<IVisitService, VisitService>();
+
 builder.Services.AddRazorPages();
 
 builder.Services.AddControllers();

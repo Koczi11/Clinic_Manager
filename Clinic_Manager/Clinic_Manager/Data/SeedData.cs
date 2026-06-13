@@ -1,4 +1,4 @@
-﻿using Clinic_Manager.Models;
+using Clinic_Manager.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,9 +24,9 @@ public class SeedData
             }
         }
 
+        // 1. Seed Admin
         string adminEmail = "admin@clinic.com";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
         if (adminUser == null)
         {
             var user = new IdentityUser
@@ -35,17 +35,52 @@ public class SeedData
                 Email = adminEmail,
                 EmailConfirmed = true
             };
-
             var createAdmin = await userManager.CreateAsync(user, "SecureAdmin123!");
-
             if (createAdmin.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, "Admin");
             }
         }
 
+        // 2. Seed Doctor (Lekarz)
+        string doctorEmail = "lekarz@clinic.com";
+        var doctorUser = await userManager.FindByEmailAsync(doctorEmail);
+        if (doctorUser == null)
+        {
+            var user = new IdentityUser
+            {
+                UserName = doctorEmail,
+                Email = doctorEmail,
+                EmailConfirmed = true
+            };
+            var createDoctor = await userManager.CreateAsync(user, "SecureDoctor123!");
+            if (createDoctor.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "Lekarz");
+            }
+        }
+
+        // 3. Seed Receptionist (Rejestratorka)
+        string receptionistEmail = "rejestratorka@clinic.com";
+        var receptionistUser = await userManager.FindByEmailAsync(receptionistEmail);
+        if (receptionistUser == null)
+        {
+            var user = new IdentityUser
+            {
+                UserName = receptionistEmail,
+                Email = receptionistEmail,
+                EmailConfirmed = true
+            };
+            var createReceptionist = await userManager.CreateAsync(user, "SecureStaff123!");
+            if (createReceptionist.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "Rejestratorka");
+            }
+        }
+
         await SeedPatients(context);
         await SeedMedications(context);
+        await SeedVisits(context, userManager);
     }
 
      private static async Task SeedPatients(ApplicationDbContext context)
@@ -100,5 +135,50 @@ public class SeedData
 
         await context.Medications.AddRangeAsync(medications);
         await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedVisits(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+    {
+        if (await context.Visits.AnyAsync())
+        {
+            return;
+        }
+
+        var doctor = await userManager.FindByEmailAsync("lekarz@clinic.com");
+        var patient = await context.Patients.FirstOrDefaultAsync(p => p.Pesel == "90010112345"); // Jan Kowalski
+
+        if (doctor != null && patient != null)
+        {
+            var visits = new List<Visit>
+            {
+                new()
+                {
+                    PatientId = patient.Id,
+                    DoctorId = doctor.Id,
+                    VisitDate = DateTime.Now.AddDays(1).Date.AddHours(10), // tomorrow at 10:00
+                    Status = VisitStatus.Scheduled,
+                    Description = "Kontrola po zabiegu i omówienie wyników badań."
+                },
+                new()
+                {
+                    PatientId = patient.Id,
+                    DoctorId = doctor.Id,
+                    VisitDate = DateTime.Now.AddHours(2), // today in 2 hours
+                    Status = VisitStatus.InProgress,
+                    Description = "Wizyta diagnostyczna - podejrzenie infekcji."
+                },
+                new()
+                {
+                    PatientId = patient.Id,
+                    DoctorId = doctor.Id,
+                    VisitDate = DateTime.Now.AddDays(-2).Date.AddHours(14), // 2 days ago at 14:00
+                    Status = VisitStatus.Completed,
+                    Description = "Konsultacja ogólna, wypisanie recepty."
+                }
+            };
+
+            await context.Visits.AddRangeAsync(visits);
+            await context.SaveChangesAsync();
+        }
     }
 }
