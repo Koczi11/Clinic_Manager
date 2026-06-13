@@ -17,6 +17,11 @@
                 <span asp-validation-for="Input.Pesel" class="text-danger"></span>
             </div>
             <div class="mb-3">
+                <label asp-for="Input.InsuranceNumber" class="form-label">Numer ubezpieczenia</label>
+                <input asp-for="Input.InsuranceNumber" class="form-control" />
+                <span asp-validation-for="Input.InsuranceNumber" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
                 <label asp-for="Input.FirstName" class="form-label">Imię</label>
                 <input asp-for="Input.FirstName" class="form-control" />
                 <span asp-validation-for="Input.FirstName" class="text-danger"></span>

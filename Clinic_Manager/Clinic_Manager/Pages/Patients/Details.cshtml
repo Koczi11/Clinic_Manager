@@ -4,30 +4,136 @@
     ViewData["Title"] = "Szczegóły pacjenta";
 }
 
-<h1 class="mb-4">@Model.Patient.LastName @Model.Patient.FirstName</h1>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
-<dl class="row">
-    <dt class="col-sm-3">PESEL</dt>
-    <dd class="col-sm-9">@Model.Patient.Pesel</dd>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@Model.Patient.LastName @Model.Patient.FirstName</h1>
+    <div>
+        <a asp-page="Edit" asp-route-id="@Model.Patient.Id" class="btn btn-primary">Edytuj dane</a>
+        <a asp-page="Index" class="btn btn-outline-secondary">Powrót do listy</a>
+    </div>
+</div>
 
-    <dt class="col-sm-3">Imię</dt>
-    <dd class="col-sm-9">@Model.Patient.FirstName</dd>
+<div class="row">
+    <!-- Dane pacjenta -->
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Dane pacjenta</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">PESEL</dt>
+                    <dd class="col-sm-7">@Model.Patient.Pesel</dd>
 
-    <dt class="col-sm-3">Nazwisko</dt>
-    <dd class="col-sm-9">@Model.Patient.LastName</dd>
+                    <dt class="col-sm-5">Imię</dt>
+                    <dd class="col-sm-7">@Model.Patient.FirstName</dd>
 
-    <dt class="col-sm-3">Data urodzenia</dt>
-    <dd class="col-sm-9">@Model.Patient.DateOfBirth.ToString("yyyy-MM-dd")</dd>
+                    <dt class="col-sm-5">Nazwisko</dt>
+                    <dd class="col-sm-7">@Model.Patient.LastName</dd>
 
-    <dt class="col-sm-3">Telefon</dt>
-    <dd class="col-sm-9">@(Model.Patient.PhoneNumber ?? "—")</dd>
+                    <dt class="col-sm-5">Data urodzenia</dt>
+                    <dd class="col-sm-7">@Model.Patient.DateOfBirth.ToString("yyyy-MM-dd")</dd>
 
-    <dt class="col-sm-3">E-mail</dt>
-    <dd class="col-sm-9">@(Model.Patient.Email ?? "—")</dd>
+                    <dt class="col-sm-5">Nr ubezpieczenia</dt>
+                    <dd class="col-sm-7">@(Model.Patient.InsuranceNumber ?? "—")</dd>
 
-    <dt class="col-sm-3">Adres</dt>
-    <dd class="col-sm-9">@(Model.Patient.Address ?? "—")</dd>
-</dl>
+                    <dt class="col-sm-5">Telefon</dt>
+                    <dd class="col-sm-7">@(Model.Patient.PhoneNumber ?? "—")</dd>
 
-<a asp-page="Edit" asp-route-id="@Model.Patient.Id" class="btn btn-primary">Edytuj</a>
-<a asp-page="Index" class="btn btn-outline-secondary">Powrót do listy</a>
+                    <dt class="col-sm-5">E-mail</dt>
+                    <dd class="col-sm-7">@(Model.Patient.Email ?? "—")</dd>
+
+                    <dt class="col-sm-5">Adres</dt>
+                    <dd class="col-sm-7">@(Model.Patient.Address ?? "—")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wgrywanie nowego dokumentu -->
+    <div class="col-md-7 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Dodaj dokument / skan</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" asp-route-id="@Model.Patient.Id">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="UploadInput.Title" class="form-label">Tytuł dokumentu</label>
+                        <input asp-for="UploadInput.Title" class="form-control" placeholder="np. Skierowanie, Wyniki badań krwi..." />
+                        <span asp-validation-for="UploadInput.Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UploadInput.File" class="form-label">Wybierz plik (PDF, JPG, PNG, max 5MB)</label>
+                        <input asp-for="UploadInput.File" type="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+                        <span asp-validation-for="UploadInput.File" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Prześlij plik</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kartoteka pacjenta -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="card-title mb-0">Kartoteka medyczna (dokumentacja)</h5>
+    </div>
+    <div class="card-body">
+        @if (!Model.MedicalRecords.Any())
+        {
+            <div class="alert alert-info mb-0">Brak załączonych skanów lub dokumentów dla tego pacjenta.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Tytuł dokumentu</th>
+                            <th>Data dodania</th>
+                            <th>Nazwa pliku</th>
+                            <th class="text-end">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var record in Model.MedicalRecords)
+                        {
+                            <tr>
+                                <td><strong>@record.Title</strong></td>
+                                <td>@record.DateAdded.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>
+                                    <span class="text-muted small">@System.IO.Path.GetFileName(record.DocumentScanUrl)</span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="@record.DocumentScanUrl" target="_blank" class="btn btn-sm btn-outline-primary me-1">Pokaż podgląd</a>
+                                    <a href="@record.DocumentScanUrl" download class="btn btn-sm btn-outline-secondary me-1">Pobierz</a>
+                                    <form method="post" asp-page-handler="DeleteRecord" asp-route-recordId="@record.Id" asp-route-id="@Model.Patient.Id" class="d-inline"
+                                          onsubmit="return confirm('Czy na pewno chcesz trwale usunąć ten dokument?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Usuń</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

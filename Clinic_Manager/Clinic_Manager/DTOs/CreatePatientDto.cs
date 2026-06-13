@@ -30,4 +30,8 @@ public class CreatePatientDto
 
     [StringLength(250)]
     public string? Address { get; set; }
+
+    [StringLength(50, ErrorMessage = "Numer ubezpieczenia nie może przekraczać 50 znaków.")]
+    [Display(Name = "Numer ubezpieczenia")]
+    public string? InsuranceNumber { get; set; }
 }
