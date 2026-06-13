@@ -23,4 +23,12 @@ public class Visit
 
     [StringLength(500)]
     public string? Description { get; set; }
+
+    public ICollection<ProcedurePerformed> ProceduresPerformed { get; set; } = new List<ProcedurePerformed>();
+    public ICollection<ClinicalNote> ClinicalNotes { get; set; } = new List<ClinicalNote>();
+    public ICollection<PrescribedMedication> PrescribedMedications { get; set; } = new List<PrescribedMedication>();
+
+    public decimal TotalCost =>
+        ProceduresPerformed.Sum(p => p.Procedure.Cost) +
+        PrescribedMedications.Sum(pm => pm.Quantity * pm.Medication.UnitPrice);
 }

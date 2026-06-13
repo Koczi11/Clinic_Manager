@@ -1,0 +1,260 @@
+@page
+@model Clinic_Manager.Pages.Visits.DetailsModel
+@{
+    ViewData["Title"] = "Szczegóły wizyty";
+    var canEditMedicalData = User.IsInRole("Lekarz") || User.IsInRole("Admin");
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Szczegóły wizyty #@Model.Visit.Id</h1>
+    <div>
+        <a asp-page="Index" class="btn btn-outline-secondary">Powrót do harmonogramu</a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Podstawowe informacje o wizycie -->
+    <div class="col-md-7 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Informacje o wizycie</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Pacjent</dt>
+                    <dd class="col-sm-8"><strong>@Model.Visit.PatientName</strong></dd>
+
+                    <dt class="col-sm-4">Lekarz prowadzący</dt>
+                    <dd class="col-sm-8">@Model.Visit.DoctorName</dd>
+
+                    <dt class="col-sm-4">Data i godzina</dt>
+                    <dd class="col-sm-8">@Model.Visit.VisitDate.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                    <dt class="col-sm-4">Status wizyty</dt>
+                    <dd class="col-sm-8">
+                        @switch (Model.Visit.Status)
+                        {
+                            case Clinic_Manager.Models.VisitStatus.Scheduled:
+                                <span class="badge bg-info text-dark">Zaplanowana</span>
+                                break;
+                            case Clinic_Manager.Models.VisitStatus.InProgress:
+                                <span class="badge bg-warning text-dark">W trakcie</span>
+                                break;
+                            case Clinic_Manager.Models.VisitStatus.Completed:
+                                <span class="badge bg-success">Zakończona</span>
+                                break;
+                            case Clinic_Manager.Models.VisitStatus.Canceled:
+                                <span class="badge bg-danger">Anulowana</span>
+                                break;
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Cel / Opis początkowy</dt>
+                    <dd class="col-sm-8">@(Model.Visit.Description ?? "—")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Podsumowanie kosztów wizyty -->
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm h-100 border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Podsumowanie finansowe</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Wykonane procedury:</span>
+                        <strong>@Model.Visit.ProceduresPerformed.Sum(p => p.Cost).ToString("0.00") zł</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Przepisane leki:</span>
+                        <strong>@Model.Visit.PrescribedMedications.Sum(pm => pm.TotalCost).ToString("0.00") zł</strong>
+                    </div>
+                    <hr />
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <span class="fs-5">Łączny koszt:</span>
+                    <span class="fs-4 text-success fw-bold">@Model.Visit.TotalCost.ToString("0.00") zł</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sekcja Danych Medycznych -->
+<div class="row">
+    <!-- Notatki Kliniczne (Clinical Notes) -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">📝 Notatki kliniczne (wywiad, rozpoznanie, zalecenia)</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                    @if (!Model.Visit.ClinicalNotes.Any())
+                    {
+                        <p class="text-muted italic">Brak notatek do tej wizyty.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group mb-3" style="max-height: 300px; overflow-y: auto;">
+                            @foreach (var note in Model.Visit.ClinicalNotes)
+                            {
+                                <div class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1 text-primary">@note.AuthorName</h6>
+                                        <small class="text-muted">@note.DateCreated.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small>
+                                    </div>
+                                    <p class="mb-1 text-break" style="white-space: pre-wrap;">@note.Content</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                @if (canEditMedicalData)
+                {
+                    <div class="border-top pt-3">
+                        <form method="post" asp-page-handler="AddNote" asp-route-id="@Model.Visit.Id">
+                            <div class="mb-3">
+                                <label asp-for="NewNote.Content" class="form-label font-weight-bold">Dodaj nową notatkę medyczną</label>
+                                <textarea asp-for="NewNote.Content" rows="3" class="form-control" placeholder="Wpisz treść notatki klinicznej..."></textarea>
+                                <span asp-validation-for="NewNote.Content" class="text-danger"></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">Zapisz notatkę</button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-secondary py-2 small mb-0 mt-3">
+                        Tylko zalogowany Lekarz może dodawać notatki medyczne.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Wykonane Procedury i Przepisane Leki -->
+    <div class="col-md-6 mb-4 d-flex flex-column gap-4">
+        <!-- Procedury Medyczne -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">🩺 Wykonane procedury medyczne</h5>
+            </div>
+            <div class="card-body">
+                @if (!Model.Visit.ProceduresPerformed.Any())
+                {
+                    <p class="text-muted mb-3">Nie przypisano jeszcze żadnych procedur.</p>
+                }
+                else
+                {
+                    <ul class="list-group mb-3">
+                        @foreach (var proc in Model.Visit.ProceduresPerformed)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>@proc.ProcedureName</span>
+                                <span class="badge bg-secondary font-weight-normal">@proc.Cost.ToString("0.00") zł</span>
+                            </li>
+                        }
+                    </ul>
+                }
+
+                @if (canEditMedicalData)
+                {
+                    <form method="post" asp-page-handler="AddProcedure" asp-route-id="@Model.Visit.Id" class="row g-2 align-items-center">
+                        <div class="col-sm-8">
+                            <select asp-for="SelectedProcedureId" asp-items="Model.AvailableProcedures" class="form-select form-select-sm">
+                                <option value="">-- Wybierz procedurę --</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-success btn-sm w-100">Dodaj</button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+
+        <!-- Przepisane Leki (Recepty) -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">💊 Przepisane leki / Recepta</h5>
+            </div>
+            <div class="card-body">
+                @if (!Model.Visit.PrescribedMedications.Any())
+                {
+                    <p class="text-muted mb-3">Brak przepisanych leków w ramach tej wizyty.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped align-middle mb-3">
+                            <thead>
+                                <tr>
+                                    <th>Lek</th>
+                                    <th>Dawkowanie</th>
+                                    <th>Ilość</th>
+                                    <th class="text-end">Cena</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var pm in Model.Visit.PrescribedMedications)
+                                {
+                                    <tr>
+                                        <td><strong>@pm.MedicationName</strong></td>
+                                        <td><span class="small">@pm.Dosage</span></td>
+                                        <td>@pm.Quantity szt.</td>
+                                        <td class="text-end">@pm.TotalCost.ToString("0.00") zł</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                @if (canEditMedicalData)
+                {
+                    <div class="border-top pt-3">
+                        <h6 class="card-subtitle mb-3 text-muted small">Przepisz nowy lek:</h6>
+                        <form method="post" asp-page-handler="AddMedication" asp-route-id="@Model.Visit.Id">
+                            <div class="row g-2 mb-2">
+                                <div class="col-sm-12">
+                                    <select asp-for="NewMedication.MedicationId" asp-items="Model.AvailableMedications" class="form-select form-select-sm">
+                                        <option value="">-- Wybierz lek --</option>
+                                    </select>
+                                    <span asp-validation-for="NewMedication.MedicationId" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-sm-8">
+                                    <input asp-for="NewMedication.Dosage" class="form-control form-control-sm" placeholder="np. 2x1 tabletka rano i wieczorem" />
+                                    <span asp-validation-for="NewMedication.Dosage" class="text-danger small"></span>
+                                </div>
+                                <div class="col-sm-4">
+                                    <input asp-for="NewMedication.Quantity" type="number" class="form-control form-control-sm" placeholder="Ilość" />
+                                    <span asp-validation-for="NewMedication.Quantity" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm mt-1">Przepisz lek</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

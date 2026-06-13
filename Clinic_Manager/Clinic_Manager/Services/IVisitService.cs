@@ -11,4 +11,7 @@ public interface IVisitService
     Task<VisitDto?> GetByIdAsync(int id);
     Task<VisitDto> CreateAsync(CreateVisitDto dto);
     Task<bool> UpdateStatusAsync(int id, VisitStatus status);
+    Task<ClinicalNoteDto> AddClinicalNoteAsync(int visitId, CreateClinicalNoteDto dto, string authorName);
+    Task<ProcedurePerformedDto> AddProcedurePerformedAsync(int visitId, int procedureId);
+    Task<PrescribedMedicationDto> AddPrescribedMedicationAsync(int visitId, CreatePrescribedMedicationDto dto);
 }

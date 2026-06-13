@@ -12,4 +12,9 @@ public class VisitDto
     public DateTime VisitDate { get; set; }
     public VisitStatus Status { get; set; }
     public string? Description { get; set; }
+
+    public List<ProcedurePerformedDto> ProceduresPerformed { get; set; } = new();
+    public List<ClinicalNoteDto> ClinicalNotes { get; set; } = new();
+    public List<PrescribedMedicationDto> PrescribedMedications { get; set; } = new();
+    public decimal TotalCost { get; set; }
 }

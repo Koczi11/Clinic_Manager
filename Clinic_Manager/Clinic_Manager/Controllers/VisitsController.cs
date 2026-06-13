@@ -76,4 +76,61 @@ public class VisitsController : ControllerBase
         var result = await _visitService.UpdateStatusAsync(id, dto.Status);
         return result ? NoContent() : NotFound();
     }
+
+    [HttpPost("{id:int}/notes")]
+    [Authorize(Roles = "Admin,Lekarz")]
+    [ProducesResponseType(typeof(ClinicalNoteDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ClinicalNoteDto>> AddNote(int id, [FromBody] CreateClinicalNoteDto dto)
+    {
+        try
+        {
+            var author = User.Identity?.Name ?? "Lekarz";
+            var note = await _visitService.AddClinicalNoteAsync(id, dto, author);
+            return CreatedAtAction(nameof(GetById), new { id = note.VisitId }, note);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("{id:int}/procedures")]
+    [Authorize(Roles = "Admin,Lekarz")]
+    [ProducesResponseType(typeof(ProcedurePerformedDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ProcedurePerformedDto>> AddProcedure(int id, [FromBody] AddProcedureRequest request)
+    {
+        try
+        {
+            var pp = await _visitService.AddProcedurePerformedAsync(id, request.ProcedureId);
+            return CreatedAtAction(nameof(GetById), new { id = pp.VisitId }, pp);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("{id:int}/medications")]
+    [Authorize(Roles = "Admin,Lekarz")]
+    [ProducesResponseType(typeof(PrescribedMedicationDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<PrescribedMedicationDto>> AddMedication(int id, [FromBody] CreatePrescribedMedicationDto dto)
+    {
+        try
+        {
+            var pm = await _visitService.AddPrescribedMedicationAsync(id, dto);
+            return CreatedAtAction(nameof(GetById), new { id = pm.VisitId }, pm);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+}
+
+public class AddProcedureRequest
+{
+    public int ProcedureId { get; set; }
 }

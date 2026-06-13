@@ -17,6 +17,10 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Medication> Medications => Set<Medication>();
     public DbSet<MedicalRecord> MedicalRecords => Set<MedicalRecord>();
     public DbSet<Visit> Visits => Set<Visit>();
+    public DbSet<Procedure> Procedures => Set<Procedure>();
+    public DbSet<ProcedurePerformed> ProceduresPerformed => Set<ProcedurePerformed>();
+    public DbSet<ClinicalNote> ClinicalNotes => Set<ClinicalNote>();
+    public DbSet<PrescribedMedication> PrescribedMedications => Set<PrescribedMedication>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -63,6 +67,54 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             entity.HasIndex(v => v.PatientId);
             entity.HasIndex(v => v.DoctorId);
             entity.HasIndex(v => v.VisitDate);
+        });
+
+        builder.Entity<Procedure>(entity =>
+        {
+            entity.Property(p => p.Cost).HasPrecision(18, 2);
+            entity.HasIndex(p => p.Name);
+        });
+
+        builder.Entity<ProcedurePerformed>(entity =>
+        {
+            entity.HasOne(pp => pp.Visit)
+                .WithMany(v => v.ProceduresPerformed)
+                .HasForeignKey(pp => pp.VisitId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(pp => pp.Procedure)
+                .WithMany()
+                .HasForeignKey(pp => pp.ProcedureId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(pp => pp.VisitId);
+            entity.HasIndex(pp => pp.ProcedureId);
+        });
+
+        builder.Entity<ClinicalNote>(entity =>
+        {
+            entity.HasOne(cn => cn.Visit)
+                .WithMany(v => v.ClinicalNotes)
+                .HasForeignKey(cn => cn.VisitId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(cn => cn.VisitId);
+        });
+
+        builder.Entity<PrescribedMedication>(entity =>
+        {
+            entity.HasOne(pm => pm.Visit)
+                .WithMany(v => v.PrescribedMedications)
+                .HasForeignKey(pm => pm.VisitId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(pm => pm.Medication)
+                .WithMany()
+                .HasForeignKey(pm => pm.MedicationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(pm => pm.VisitId);
+            entity.HasIndex(pm => pm.MedicationId);
         });
     }
 }

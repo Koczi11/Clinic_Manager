@@ -85,6 +85,7 @@ else
                             }
                         </td>
                         <td class="text-end">
+                            <a asp-page="Details" asp-route-id="@visit.Id" class="btn btn-sm btn-outline-info me-1">Szczegóły</a>
                             @if (visit.Status == Clinic_Manager.Models.VisitStatus.Scheduled)
                             {
                                 <form method="post" asp-page-handler="UpdateStatus" asp-route-id="@visit.Id" asp-route-newStatus="InProgress" class="d-inline">
@@ -104,10 +105,6 @@ else
                                       onsubmit="return confirm('Czy na pewno anulować tę wizytę?');">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Anuluj</button>
                                 </form>
-                            }
-                            else
-                            {
-                                <span class="text-muted small">Brak akcji</span>
                             }
                         </td>
                     </tr>
