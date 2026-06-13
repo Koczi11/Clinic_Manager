@@ -16,6 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Patient> Patients => Set<Patient>();
     public DbSet<Medication> Medications => Set<Medication>();
     public DbSet<MedicalRecord> MedicalRecords => Set<MedicalRecord>();
+    public DbSet<Visit> Visits => Set<Visit>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -45,6 +46,23 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(mr => mr.PatientId);
+        });
+
+        builder.Entity<Visit>(entity =>
+        {
+            entity.HasOne(v => v.Patient)
+                .WithMany()
+                .HasForeignKey(v => v.PatientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(v => v.Doctor)
+                .WithMany()
+                .HasForeignKey(v => v.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(v => v.PatientId);
+            entity.HasIndex(v => v.DoctorId);
+            entity.HasIndex(v => v.VisitDate);
         });
     }
 }
