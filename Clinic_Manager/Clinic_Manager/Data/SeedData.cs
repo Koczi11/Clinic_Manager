@@ -80,6 +80,7 @@ public class SeedData
 
         await SeedPatients(context);
         await SeedMedications(context);
+        await SeedProcedures(context);
         await SeedVisits(context, userManager);
     }
 
@@ -180,5 +181,25 @@ public class SeedData
             await context.Visits.AddRangeAsync(visits);
             await context.SaveChangesAsync();
         }
+    }
+
+    private static async Task SeedProcedures(ApplicationDbContext context)
+    {
+        if (await context.Procedures.AnyAsync())
+        {
+            return;
+        }
+
+        var procedures = new List<Procedure>
+        {
+            new() { Name = "Konsultacja lekarska", Description = "Standardowa konsultacja lekarska", Cost = 150.00m },
+            new() { Name = "Badanie EKG", Description = "Elektrokardiogram spoczynkowy", Cost = 80.00m },
+            new() { Name = "Badanie krwi", Description = "Podstawowe badanie morfologiczne krwi", Cost = 50.00m },
+            new() { Name = "Ultrasonografia (USG)", Description = "Ultrasonograficzne badanie jamy brzusznej lub inne", Cost = 200.00m },
+            new() { Name = "Szczepienie ochronne", Description = "Iniekcja szczepionki profilaktycznej", Cost = 100.00m }
+        };
+
+        await context.Procedures.AddRangeAsync(procedures);
+        await context.SaveChangesAsync();
     }
 }

@@ -33,7 +33,9 @@ builder.Services.AddSingleton<MedicalRecordMapper>();
 builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 
 builder.Services.AddSingleton<VisitMapper>();
+builder.Services.AddSingleton<ClinicalMapper>();
 builder.Services.AddScoped<IVisitService, VisitService>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddRazorPages();
 
