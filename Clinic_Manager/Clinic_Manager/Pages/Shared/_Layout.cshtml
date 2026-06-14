@@ -35,6 +35,12 @@
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Visits/Index">Wizyty</a>
                             </li>
                         }
+                        @if (User.IsInRole("Admin") || User.IsInRole("Rejestratorka"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Reports/Index">Raporty</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>

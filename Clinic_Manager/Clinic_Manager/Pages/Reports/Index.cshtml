@@ -1,0 +1,38 @@
+@page
+@model Clinic_Manager.Pages.Reports.IndexModel
+@{
+    ViewData["Title"] = "Raporty";
+}
+
+<h1 class="mb-4">Raport kosztów świadczeń</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <p class="text-muted">Raport obejmuje wyłącznie wizyty o statusie „Zakończona". Puste pola = bez ograniczenia.</p>
+
+            <div class="mb-3">
+                <label asp-for="SelectedMonth" class="form-label">Miesiąc</label>
+                <select asp-for="SelectedMonth" asp-items="Model.Months" class="form-select">
+                    <option value="">— wszystkie miesiące —</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PatientId" class="form-label">Pacjent</label>
+                <select asp-for="PatientId" asp-items="Model.Patients" class="form-select">
+                    <option value="">— wszyscy pacjenci —</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DoctorId" class="form-label">Lekarz</label>
+                <select asp-for="DoctorId" asp-items="Model.Doctors" class="form-select">
+                    <option value="">— wszyscy lekarze —</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Generuj PDF</button>
+        </form>
+    </div>
+</div>
