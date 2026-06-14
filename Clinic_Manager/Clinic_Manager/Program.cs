@@ -4,10 +4,15 @@ using Clinic_Manager.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
+using NLog.Web;
+using Clinic_Manager.Middleware;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Host.UseNLog();
+
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -76,6 +81,8 @@ else
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
