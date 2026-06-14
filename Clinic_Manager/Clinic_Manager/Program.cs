@@ -41,6 +41,7 @@ builder.Services.AddScoped<IVisitService, VisitService>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddHostedService<UpcomingVisitsReportBackgroundService>();
 
 builder.Services.AddRazorPages();
 
