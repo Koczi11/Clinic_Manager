@@ -49,6 +49,21 @@ public class VisitService : IVisitService
         return _mapper.ToDtoList(visits);
     }
 
+    public async Task<List<VisitDto>> GetTodayAsync()
+    {
+        var today = DateTime.Today;
+        var tomorrow = today.AddDays(1);
+
+        var visits = await _context.Visits
+            .Include(v => v.Patient)
+            .Include(v => v.Doctor)
+            .Where(v => v.VisitDate >= today && v.VisitDate < tomorrow)
+            .OrderBy(v => v.VisitDate)
+            .ToListAsync();
+
+        return _mapper.ToDtoList(visits);
+    }
+
     public async Task<List<VisitDto>> GetByPatientIdAsync(int patientId)
     {
         var visits = await _context.Visits

@@ -430,6 +430,8 @@ FodyWeavers.xsd
 
 # Generated PDF reports
 *.pdf
+# wyjątek: raport diagnostyczny SQL jest częścią dokumentacji projektu (US-12)
+!raport-sql-profiler.pdf
 
 # Application log files
 logs/

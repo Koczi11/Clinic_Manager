@@ -26,6 +26,14 @@ public class VisitsController : ControllerBase
         return Ok(visits);
     }
 
+    [HttpGet("today")]
+    [ProducesResponseType(typeof(List<VisitDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<VisitDto>>> GetToday()
+    {
+        var visits = await _visitService.GetTodayAsync();
+        return Ok(visits);
+    }
+
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(VisitDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
