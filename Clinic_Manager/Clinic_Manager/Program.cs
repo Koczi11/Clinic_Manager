@@ -3,6 +3,9 @@ using Clinic_Manager.Mappers;
 using Clinic_Manager.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +39,8 @@ builder.Services.AddSingleton<VisitMapper>();
 builder.Services.AddSingleton<ClinicalMapper>();
 builder.Services.AddScoped<IVisitService, VisitService>();
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IReportService, ReportService>();
 
 builder.Services.AddRazorPages();
 
