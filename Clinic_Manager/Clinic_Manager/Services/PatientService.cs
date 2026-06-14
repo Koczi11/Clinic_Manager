@@ -41,44 +41,68 @@ public class PatientService : IPatientService
 
     public async Task<PatientDto> CreateAsync(CreatePatientDto dto)
     {
-        var patient = _mapper.ToEntity(dto);
+        try
+        {
+            var patient = _mapper.ToEntity(dto);
 
-        _context.Patients.Add(patient);
-        await _context.SaveChangesAsync();
+            _context.Patients.Add(patient);
+            await _context.SaveChangesAsync();
 
-        _logger.LogInformation("Utworzono pacjenta o Id {PatientId}.", patient.Id);
-        return _mapper.ToDto(patient);
+            _logger.LogInformation("Utworzono pacjenta o Id {PatientId}.", patient.Id);
+            return _mapper.ToDto(patient);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Błąd podczas tworzenia pacjenta.");
+            throw;
+        }
     }
 
     public async Task<bool> UpdateAsync(int id, UpdatePatientDto dto)
     {
-        var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == id);
-        if (patient is null)
+        try
         {
-            return false;
+            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == id);
+            if (patient is null)
+            {
+                return false;
+            }
+
+            _mapper.UpdateEntity(dto, patient);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Zaktualizowano pacjenta o Id {PatientId}.", id);
+            return true;
         }
-
-        _mapper.UpdateEntity(dto, patient);
-        await _context.SaveChangesAsync();
-
-        _logger.LogInformation("Zaktualizowano pacjenta o Id {PatientId}.", id);
-        return true;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Błąd podczas aktualizowania pacjenta o Id {PatientId}.", id);
+            throw;
+        }
     }
 
     public async Task<bool> SoftDeleteAsync(int id)
     {
-        var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == id);
-        if (patient is null)
+        try
         {
-            return false;
+            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == id);
+            if (patient is null)
+            {
+                return false;
+            }
+
+            patient.IsDeleted = true;
+            patient.DeletedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Miękko usunięto pacjenta o Id {PatientId}.", id);
+            return true;
         }
-
-        patient.IsDeleted = true;
-        patient.DeletedAt = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
-
-        _logger.LogInformation("Miękko usunięto pacjenta o Id {PatientId}.", id);
-        return true;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Błąd podczas miękkiego usuwania pacjenta o Id {PatientId}.", id);
+            throw;
+        }
     }
 
     public async Task<List<PatientDto>> SearchAsync(string query)
