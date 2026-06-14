@@ -1,0 +1,33 @@
+name: .NET CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: Clinic_Manager
+
+    - name: Build application
+      run: dotnet build --no-restore
+      working-directory: Clinic_Manager
+
+    - name: Run unit tests
+      run: dotnet test --no-build --verbosity normal
+      working-directory: Clinic_Manager
