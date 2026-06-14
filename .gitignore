@@ -430,6 +430,8 @@ FodyWeavers.xsd
 
 # Generated PDF reports
 *.pdf
+# wyjątek: raport indeksów jest częścią dokumentacji projektu (US-11)
+!raport-indeksy.pdf
 
 # Application log files
 logs/
