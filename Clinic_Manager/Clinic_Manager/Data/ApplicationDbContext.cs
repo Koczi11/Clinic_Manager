@@ -67,6 +67,9 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             entity.HasIndex(v => v.PatientId);
             entity.HasIndex(v => v.DoctorId);
             entity.HasIndex(v => v.VisitDate);
+
+            entity.HasIndex(v => new { v.DoctorId, v.VisitDate })
+                .HasDatabaseName("IX_Visits_DoctorId_VisitDate");
         });
 
         builder.Entity<Procedure>(entity =>
