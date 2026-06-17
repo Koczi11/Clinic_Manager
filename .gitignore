@@ -430,9 +430,13 @@ FodyWeavers.xsd
 
 # Generated PDF reports
 *.pdf
-# wyjątki: raporty PDF są częścią dokumentacji projektu (US-11, US-12)
+# wyjątki: raporty PDF są częścią dokumentacji projektu (US-11, US-12, US-13)
 !raport-indeksy.pdf
 !raport-sql-profiler.pdf
+!nbomber-report.pdf
+
+# Wygenerowane raporty NBomber (artefakty testów wydajności)
+nbomber-reports/
 
 # Application log files
 logs/

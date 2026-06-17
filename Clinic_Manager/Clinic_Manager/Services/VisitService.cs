@@ -64,6 +64,18 @@ public class VisitService : IVisitService
         return _mapper.ToDtoList(visits);
     }
 
+    public async Task<List<VisitDto>> GetActiveAsync()
+    {
+        var visits = await _context.Visits
+            .Include(v => v.Patient)
+            .Include(v => v.Doctor)
+            .Where(v => v.Status == VisitStatus.Scheduled || v.Status == VisitStatus.InProgress)
+            .OrderBy(v => v.VisitDate)
+            .ToListAsync();
+
+        return _mapper.ToDtoList(visits);
+    }
+
     public async Task<List<VisitDto>> GetByPatientIdAsync(int patientId)
     {
         var visits = await _context.Visits
