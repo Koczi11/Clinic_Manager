@@ -34,6 +34,15 @@ public class VisitsController : ControllerBase
         return Ok(visits);
     }
 
+    [HttpGet("active")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<VisitDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<VisitDto>>> GetActive()
+    {
+        var visits = await _visitService.GetActiveAsync();
+        return Ok(visits);
+    }
+
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(VisitDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
