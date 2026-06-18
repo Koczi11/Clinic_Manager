@@ -1,10 +1,30 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center my-5">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <h1 class="display-4 fw-bold mb-3" style="color: #e65c9c; text-shadow: 1px 1px 2px rgba(0,0,0,0.05);">Witaj w Clinic Manager!</h1>
+        <p class="lead text-muted mb-4">Zalogowano jako: <strong style="color: #e65c9c;">@User.Identity.Name</strong></p>
+    }
+    else
+    {
+        <h1 class="display-4 fw-bold mb-3" style="color: #e65c9c; text-shadow: 1px 1px 2px rgba(0,0,0,0.05);">Witaj w Clinic Manager!</h1>
+        <p class="lead text-muted mb-4">Zarządzaj kartotekami pacjentów, wizytami oraz lekami w przyjaznym systemie.</p>
+    }
+
+    <div class="my-4 d-inline-block p-3 rounded-5" style="background-color: #fff0f5; box-shadow: 0 8px 20px rgba(230, 92, 156, 0.15); border: 2px dashed #fcc6db;">
+        <img src="~/images/hello_kitty_doctor.png" alt="Hello Kitty Doctor" class="img-fluid rounded-4" style="max-width: 320px; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" />
+    </div>
+
+    @if (User.Identity?.IsAuthenticated == false)
+    {
+        <div class="mt-4">
+            <a class="btn btn-lg text-white px-5 py-3 rounded-pill fw-bold" asp-area="" asp-page="/Account/Login" style="background-color: #e65c9c; border: none; box-shadow: 0 4px 15px rgba(230, 92, 156, 0.3); transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#d44b8b'" onmouseout="this.style.backgroundColor='#e65c9c'">Przejdź do logowania</a>
+        </div>
+    }
 </div>
+
